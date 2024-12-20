@@ -122,10 +122,11 @@ public:
         while(std::getline(ifile, line)){
             lines.push_back(line);
         }
-        for(it =  lines.begin(); it < lines.end(); it++){
+        for(it = lines.begin(); it < lines.end(); it++){
             std::stringstream ss(*it);
             std::string* str =  new std::string;
             ss >> *str;
+            delete str;
             int n;
             ss >> n;
             if(n == task_id){
@@ -141,8 +142,37 @@ public:
         ifile.close();
     }
 
-    void deleteTask(int task_id, std::string t_description){
-
+    // std::logic error in this funtion
+    void deleteTask(int task_id){
+        std::ifstream ifile(path);
+        std::vector<std::string> lines;
+        std::vector<std::string>::iterator it;
+        std::string line;
+        while(std::getline(ifile, line)){
+            lines.push_back(line);
+        }
+        
+        for(it = lines.begin(); it != lines.end(); it++){
+            std::stringstream ss(*it);
+            std::string str;
+            ss >> str;
+            int n;
+            ss >> n;
+            if(n == task_id){
+                
+                std::vector<std::string>::iterator it_lines = it;
+                std::cout << "end: " << lines.back() << std::endl;
+                std::cout << "end: " <<  *(it_lines+5) << std::endl;
+                std::cout << "end: " <<  *(it_lines+4) << std::endl;
+                lines.erase(it_lines, it_lines + 6);
+                std::ofstream ofile(path, std::ios::out | std::ios::trunc);
+                for(const auto& line: lines){
+                    ofile << line << std::endl;
+                }
+                ofile.close();
+            }
+        }
+        ifile.close();
     }
 
     void markTask();
@@ -168,7 +198,8 @@ int main(int argc, char* argv[]){
         }
         else if(strcmp("delete", argv[i]) == 0){
             int task_no = atoi(argv[i+1]);
-            task.deleteTask(task_no, argv[i+2]);
+            task.deleteTask(task_no);
+            i++;
         }
     }
     
