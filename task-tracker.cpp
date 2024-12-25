@@ -10,7 +10,7 @@
 #include <vector>
 #include <iterator>
 
-/* file pointers at wrong positions*/
+/* file pointers at wrong positions (fixed)*/
 // Implemented vectors to fix the problem in an alternate way
 
 class Task{
@@ -106,6 +106,7 @@ public:
         file << "updatedAt: " << updatedAt << std::endl;
         file << std::endl;
         file.close();
+        std::cout << "Task added successfully!" << std::endl;
     }
 
     void updateTask(int task_id, std::string updated_description){
@@ -114,7 +115,7 @@ public:
         if(!fileEmpty()){
             std::cerr << "Error: Task file is empty!" << std::endl;
             ifile.close();
-            exit(0);
+            return;
         }
         std::vector<std::string> lines;
         std::vector<std::string>::iterator it;
@@ -124,25 +125,24 @@ public:
         }
         for(it = lines.begin(); it < lines.end(); it++){
             std::stringstream ss(*it);
-            std::string* str =  new std::string;
-            ss >> *str;
-            delete str;
+            ss.ignore(4, ' ');
             int n;
-            ss >> n;
-            if(n == task_id){
-                // const std::string desc = "description: "+updated_description;
-                *(it+1) = "description: "+updated_description;
-                std::ofstream ofile(path, std::ios::out | std::ios::trunc);
-                for(const auto& line_update: lines){
-                    ofile << line_update << std::endl;
+            if(ss >> n){
+                if(n == task_id){
+                    // const std::string desc = "description: "+updated_description;
+                    *(it+1) = "description: "+updated_description;
+                    std::ofstream ofile(path, std::ios::out | std::ios::trunc);
+                    for(const auto& line_update: lines){
+                        ofile << line_update << std::endl;
+                    }
+                    ofile.close();
+                    std::cout << "Task updated successfully!" << std::endl;
                 }
-                ofile.close();
             }
         }
         ifile.close();
     }
 
-    // std::logic error in this funtion
     void deleteTask(int task_id){
         std::ifstream ifile(path);
         std::vector<std::string> lines;
@@ -151,28 +151,49 @@ public:
         while(std::getline(ifile, line)){
             lines.push_back(line);
         }
+        ifile.close();
+
+        if(lines.empty()){
+            std::cerr << "Error: File is empty!" << std::endl;
+            return;
+        }
         
         for(it = lines.begin(); it != lines.end(); it++){
             std::stringstream ss(*it);
-            std::string str;
-            ss >> str;
+            
+            ss.ignore(4, ' ');
             int n;
-            ss >> n;
+            if(!(ss >> n)){
+                continue;   // Ignore lines that don't contain a valid task ID
+            }
             if(n == task_id){
-                
-                std::vector<std::string>::iterator it_lines = it;
-                std::cout << "end: " << lines.back() << std::endl;
-                std::cout << "end: " <<  *(it_lines+5) << std::endl;
-                std::cout << "end: " <<  *(it_lines+4) << std::endl;
-                lines.erase(it_lines, it_lines + 6);
-                std::ofstream ofile(path, std::ios::out | std::ios::trunc);
-                for(const auto& line: lines){
-                    ofile << line << std::endl;
+                int startLine;
+                const int numLinesToDelete = 6;
+                if(std::distance(lines.begin(), it) <= 0){
+                    startLine = 0;
                 }
-                ofile.close();
+                else{
+                    startLine = std::distance(lines.begin(), it);
+                }
+                int endLine = std::min(startLine + numLinesToDelete, static_cast<int>(lines.size()));
+
+                if(startLine >= 0 && startLine < lines.size() && startLine < endLine && endLine <= lines.size()){
+                    lines.erase(lines.begin() + startLine, lines.begin() + endLine);
+                    std::ofstream ofile(path, std::ios::out | std::ios::trunc);
+                    for(const auto& line: lines){
+                        ofile << line << std::endl;
+                    }
+                    ofile.close();
+                    std::cout << "Task deleted successfully!" << std::endl;
+                    return;
+                }
+                else{
+                    std::cerr << "Error: Invalid range for erase operation!" << std::endl;
+                    return;
+                }
             }
         }
-        ifile.close();
+        std::cerr << "Error: Task ID " << task_id << " not found!" << std::endl;
     }
 
     void markTask();
