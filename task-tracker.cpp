@@ -4,6 +4,7 @@
 #include <limits>
 #include <iomanip>
 #include <fstream>
+#include <thread>
 #include <chrono>
 #include <sstream>
 #include <string.h>
@@ -12,12 +13,16 @@
 
 /* file pointers at wrong positions (fixed)*/
 // Implemented vectors to fix the problem in an alternate way
+// Find a way to mark the task 
+
+// Function prototypes
+std::string argParse(std::string argv);
 
 class Task{
     const std::string path = "C:\\Users\\Susha\\Documents\\Programming\\C++\\Projects\\Task Tracker\\tasks.json";
     int id;
     std::string description;
-    char status =  '0';
+    std::string status =  "todo";
     std::string createdAt;
     std::string updatedAt;
 
@@ -106,7 +111,7 @@ public:
         file << "updatedAt: " << updatedAt << std::endl;
         file << std::endl;
         file.close();
-        std::cout << "Task added successfully!" << std::endl;
+        std::clog << "Task added successfully!" << std::endl;
     }
 
     void updateTask(int task_id, std::string updated_description){
@@ -136,7 +141,7 @@ public:
                         ofile << line_update << std::endl;
                     }
                     ofile.close();
-                    std::cout << "Task updated successfully!" << std::endl;
+                    std::clog << "Task updated successfully!" << std::endl;
                 }
             }
         }
@@ -184,7 +189,7 @@ public:
                         ofile << line << std::endl;
                     }
                     ofile.close();
-                    std::cout << "Task deleted successfully!" << std::endl;
+                    std::clog << "Task deleted successfully!" << std::endl;
                     return;
                 }
                 else{
@@ -196,7 +201,13 @@ public:
         std::cerr << "Error: Task ID " << task_id << " not found!" << std::endl;
     }
 
-    void markTask();
+    void markTask(int task_id, std::string argv){
+        std::istringstream iss(argv);
+        std::string;
+        iss.ignore(4, '-');
+        std::getline(iss, status);
+    }
+
     void listTask();
 
 };
@@ -213,13 +224,15 @@ int main(int argc, char* argv[]){
             }
         }
         else if(strcmp("update", argv[i]) == 0){
-            int task_no = atoi(argv[i+1]);
-            task.updateTask(task_no, argv[i+2]);
+            task.updateTask(atoi(argv[i+1]), argv[i+2]);
             i += 2;
         }
         else if(strcmp("delete", argv[i]) == 0){
-            int task_no = atoi(argv[i+1]);
-            task.deleteTask(task_no);
+            task.deleteTask(atoi(argv[i+1]));
+            i++;
+        }
+        else if(strcmp("mark", argParse(argv[i]).c_str()) == 0){
+            task.markTask(atoi(argv[i+1]), argv[i]);
             i++;
         }
     }
@@ -227,7 +240,17 @@ int main(int argc, char* argv[]){
     return 0;
 }
 
+std::string argParse(std::string argv){
+    std::istringstream ss(argv);
+    std::string mark_buf = "";
+    if(ss){
+        std::getline(ss, mark_buf, '-');
+    }
+    return mark_buf;
+}
+
 // Main
+
 // do{
 
     //     std::cout << "Task Tracker!" << std::endl;
