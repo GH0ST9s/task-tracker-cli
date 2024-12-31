@@ -4,16 +4,13 @@
 #include <limits>
 #include <iomanip>
 #include <fstream>
-#include <thread>
 #include <chrono>
 #include <sstream>
 #include <string.h>
 #include <vector>
 #include <iterator>
 
-/* file pointers at wrong positions (fixed)*/
-// Implemented vectors to fix the problem in an alternate way
-// Find a way to mark the task 
+// Bug: command arguments following "add" command works but are also added to the task-file as tasks.
 
 // Function prototypes
 std::string argParse(std::string argv);
@@ -106,6 +103,12 @@ class Task{
         file.close();
     }
 
+    void printTask(std::vector<std::string> lines){
+        for(const auto& line: lines){
+            std::cout << line << std::endl;
+        }
+    }
+
 public:
 
     // Constructor
@@ -131,7 +134,7 @@ public:
         file << "updatedAt: " << updatedAt << std::endl;
         file << std::endl;
         file.close();
-        std::clog << "Task added successfully!" << std::endl;
+        std::clog << "Task added successfully! (ID: " << id << ")" << std::endl;
     }
 
     void updateTask(int task_id, std::string updated_description){
@@ -161,7 +164,6 @@ public:
     void deleteTask(int task_id){
         std::vector<std::string> lines;
         readFile(lines);
-
         if(lines.empty()){
             std::cerr << "Error: File is empty!" << std::endl;
             return;
@@ -208,13 +210,8 @@ public:
         iss.ignore(5);
         iss >> updated_status;
         
-        std::ifstream ifile(path);
         std::vector<std::string> lines;
-        std::string line;
-        while(std::getline(ifile, line)){
-            lines.push_back(line);
-        }
-        ifile.close();
+        readFile(lines);
 
         if(lines.empty()){
             std::cerr << "Error: File is empty!" << std::endl;
@@ -243,10 +240,38 @@ public:
         std::cerr << "Error: Task ID " << task_id << " not found!" << std::endl;
     }
 
-    void listTask(std::string task_status){
-        std::vector<std::string> lines;
-        std::string line;
-
+    void listTask(std::string task_status = "all"){
+        if(task_status == "all" || task_status == "to-do" || task_status == "done" || task_status == "in-progress"){
+            std::vector<std::string> lines;
+            readFile(lines);
+            if(task_status == "all"){
+                printTask(lines);
+            }
+            else{
+                std::vector<std::string>::iterator it;
+                for(it = lines.begin(); it != lines.end(); it++){
+                    std::istringstream iss(*it);
+                    iss.ignore(8);
+                    std::string c_status;
+                    if(iss >> c_status){
+                        if(c_status == task_status){
+                            std::cout << *(it-2) << std::endl;
+                            std::cout << *(it-1) << std::endl;
+                            std::cout << *(it) << std::endl;
+                            std::cout << *(it+1) << std::endl;
+                            std::cout << *(it+2) << std::endl;
+                            std::cout << std::endl;
+                        }
+                        else{
+                            // std::cerr << "Error: Status not found!" << std::endl;    // Unnecessary ig
+                        }
+                    }
+                }
+                
+            }
+            return;
+        }
+        std::cerr << "Error: Invalid task status!" << std::endl;
     }
 
 };
@@ -257,7 +282,6 @@ int main(int argc, char* argv[]){
 
     for(int i = 1; i < argc; i++){
         if(strcmp("add", argv[i]) == 0){
-            // std::cout << "argc: " << argc << std::endl;
             for(int j = (i+1); j < argc; j++){
                 task.addTask(argv[j]);
             }
@@ -275,9 +299,13 @@ int main(int argc, char* argv[]){
             i++;
         }
         else if(strcmp("list", argv[i]) == 0){
-            // std::cout << "argv++: " << argv[i+1] << std::endl;
-            // task.listTask(argv[i+1]);
-            // i++;
+            if(argv[i+1] == nullptr){
+                task.listTask();
+            } 
+            else{
+                task.listTask(argv[i+1]);
+                i++;
+            }
         }
     }
     
@@ -286,7 +314,7 @@ int main(int argc, char* argv[]){
 
 std::string argParse(std::string argv){
     std::istringstream ss(argv);
-    std::string mark_buf = "";
+    std::string mark_buf;
     if(ss){
         std::getline(ss, mark_buf, '-');
     }

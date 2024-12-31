@@ -53,26 +53,38 @@ createdAt: 2024-12-20 19:50:25
 updatedAt: 2024-12-20 19:50:25
 
 id: 10
-description: deleteTask() function completed
-status: 0
+description: deleteTask()
+status: done
 createdAt: 2024-12-25 20:40:17
 updatedAt: 2024-12-25 20:40:17
 
 id: 11
 description: DSA Assignment & Report
-status: 0
+status: to-do
 createdAt: 2024-12-28 10:08:30
 updatedAt: 2024-12-28 10:08:30
 
 id: 12
 description: Statistics II Assignment
-status: in-progress
+status: to-do
 createdAt: 2024-12-28 10:08:42
 updatedAt: 2024-12-28 10:08:42
 
 id: 13
-description: markTask done!
-status: todo
+description: markTask()
+status: done
 createdAt: 2024-12-31 18:39:16
 updatedAt: 2024-12-31 18:39:16
+
+id: 14
+description: Buy groceries!
+status: to-do
+createdAt: 2024-12-31 20:14:34
+updatedAt: 2024-12-31 20:14:34
+
+id: 15
+description: listTask()
+status: done
+createdAt: 2024-12-31 20:15:01
+updatedAt: 2024-12-31 20:15:01
 
