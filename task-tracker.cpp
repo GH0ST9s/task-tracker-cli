@@ -22,7 +22,7 @@ class Task{
     const std::string path = "C:\\Users\\Susha\\Documents\\Programming\\C++\\Projects\\Task Tracker\\tasks.json";
     int id;
     std::string description;
-    std::string status =  "todo";
+    std::string status =  "to-do";
     std::string createdAt;
     std::string updatedAt;
 
@@ -33,6 +33,7 @@ class Task{
         file.close();
     }
 
+    // Error handling functions
     void fileError(){
         std::fstream file(path);
         if(!file){
@@ -50,6 +51,25 @@ class Task{
         else {
             return 0;
         }
+    }
+
+    void readFile(std::vector<std::string>& lines){
+        std::ifstream ifile(path);
+        fileError();
+        std::string line;
+        while(std::getline(ifile, line)){
+            lines.push_back(line);
+        }
+        ifile.close();
+    }
+
+    void writeFile(std::vector<std::string> lines){
+        std::ofstream ofile(path, std::ios::out | std::ios::trunc);
+        fileError();
+        for(const auto& line: lines){
+            ofile << line << std::endl;
+        }
+        ofile.close();
     }
 
     std::string date(){
@@ -115,19 +135,14 @@ public:
     }
 
     void updateTask(int task_id, std::string updated_description){
-        std::ifstream ifile(path);
-        fileError();
+        std::vector<std::string> lines;
+        readFile(lines);
         if(!fileEmpty()){
             std::cerr << "Error: Task file is empty!" << std::endl;
-            ifile.close();
             return;
         }
-        std::vector<std::string> lines;
+        
         std::vector<std::string>::iterator it;
-        std::string line;
-        while(std::getline(ifile, line)){
-            lines.push_back(line);
-        }
         for(it = lines.begin(); it < lines.end(); it++){
             std::stringstream ss(*it);
             ss.ignore(4, ' ');
@@ -136,33 +151,23 @@ public:
                 if(n == task_id){
                     // const std::string desc = "description: "+updated_description;
                     *(it+1) = "description: "+updated_description;
-                    std::ofstream ofile(path, std::ios::out | std::ios::trunc);
-                    for(const auto& line_update: lines){
-                        ofile << line_update << std::endl;
-                    }
-                    ofile.close();
+                    writeFile(lines);
                     std::clog << "Task updated successfully!" << std::endl;
                 }
             }
         }
-        ifile.close();
     }
 
     void deleteTask(int task_id){
-        std::ifstream ifile(path);
         std::vector<std::string> lines;
-        std::vector<std::string>::iterator it;
-        std::string line;
-        while(std::getline(ifile, line)){
-            lines.push_back(line);
-        }
-        ifile.close();
+        readFile(lines);
 
         if(lines.empty()){
             std::cerr << "Error: File is empty!" << std::endl;
             return;
         }
-        
+
+        std::vector<std::string>::iterator it;        
         for(it = lines.begin(); it != lines.end(); it++){
             std::stringstream ss(*it);
             
@@ -184,11 +189,7 @@ public:
 
                 if(startLine >= 0 && startLine < lines.size() && startLine < endLine && endLine <= lines.size()){
                     lines.erase(lines.begin() + startLine, lines.begin() + endLine);
-                    std::ofstream ofile(path, std::ios::out | std::ios::trunc);
-                    for(const auto& line: lines){
-                        ofile << line << std::endl;
-                    }
-                    ofile.close();
+                    writeFile(lines);
                     std::clog << "Task deleted successfully!" << std::endl;
                     return;
                 }
@@ -203,12 +204,50 @@ public:
 
     void markTask(int task_id, std::string argv){
         std::istringstream iss(argv);
-        std::string;
-        iss.ignore(4, '-');
-        std::getline(iss, status);
+        std::string updated_status;
+        iss.ignore(5);
+        iss >> updated_status;
+        
+        std::ifstream ifile(path);
+        std::vector<std::string> lines;
+        std::string line;
+        while(std::getline(ifile, line)){
+            lines.push_back(line);
+        }
+        ifile.close();
+
+        if(lines.empty()){
+            std::cerr << "Error: File is empty!" << std::endl;
+            return;
+        }
+
+        std::vector<std::string>::iterator it;
+        for(it = lines.begin(); it != lines.end(); it++){
+            std::istringstream iss(*it);
+            iss.ignore(4);
+            int no;
+            if(iss >> no && no == task_id){
+                std::string stat[3] = {"to-do", "in-progress", "done"};
+                if(updated_status == stat[0] || updated_status == stat[1] || updated_status == stat[2]){
+                    *(it+2) = "status: " + updated_status;
+                    writeFile(lines);
+                    std::clog << "Status updated successfully!" << std::endl;
+                    return;
+                }
+                else{
+                    std::cerr << "Error: Invalid command!" << std::endl;
+                    return;
+                }
+            }
+        }
+        std::cerr << "Error: Task ID " << task_id << " not found!" << std::endl;
     }
 
-    void listTask();
+    void listTask(std::string task_status){
+        std::vector<std::string> lines;
+        std::string line;
+
+    }
 
 };
 
@@ -234,6 +273,11 @@ int main(int argc, char* argv[]){
         else if(strcmp("mark", argParse(argv[i]).c_str()) == 0){
             task.markTask(atoi(argv[i+1]), argv[i]);
             i++;
+        }
+        else if(strcmp("list", argv[i]) == 0){
+            // std::cout << "argv++: " << argv[i+1] << std::endl;
+            // task.listTask(argv[i+1]);
+            // i++;
         }
     }
     

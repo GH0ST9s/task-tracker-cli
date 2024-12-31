@@ -1,30 +1,30 @@
 id: 1
 description: Back!
-status: 0
+status: in-progress
 createdAt: 2024-12-17 18:59:06
 updatedAt: 2024-12-17 18:59:06
 
 id: 2
 description: Another
-status: 0
+status: to-do
 createdAt: 2024-12-17 19:35:36
 updatedAt: 2024-12-17 19:35:36
 
 id: 3
 description: Jindagi namilegi dobara
-status: 0
+status: in-progress
 createdAt: 2024-12-17 19:35:40
 updatedAt: 2024-12-17 19:35:40
 
 id: 4
 description: Another progress has been made!
-status: 0
+status: done
 createdAt: 2024-12-19 20:23:25
 updatedAt: 2024-12-19 20:23:25
 
 id: 5
 description: Increased C++ stats
-status: 0
+status: in-progress
 createdAt: 2024-12-19 20:24:07
 updatedAt: 2024-12-19 20:24:07
 
@@ -66,7 +66,13 @@ updatedAt: 2024-12-28 10:08:30
 
 id: 12
 description: Statistics II Assignment
-status: 0
+status: in-progress
 createdAt: 2024-12-28 10:08:42
 updatedAt: 2024-12-28 10:08:42
+
+id: 13
+description: markTask done!
+status: todo
+createdAt: 2024-12-31 18:39:16
+updatedAt: 2024-12-31 18:39:16
 
