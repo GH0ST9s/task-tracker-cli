@@ -9,18 +9,74 @@
 #include <string.h>
 #include <vector>
 #include <iterator>
+#include <algorithm>
 
 // Bug: command arguments following "add" command works but are also added to the task-file as tasks.
 // Formed JSON object //
 // Form JSON array  //
 // Implement how to write the object/array to file in a proper format   //
 // Display tasks
+// Learn to make tables
 // You can do it!
 
 constexpr auto max_size = std::numeric_limits<std::streamsize>::max();
 
+enum Label{
+    NOTHING = 0, ID, DESCRIPTION, STATUS, CREATED, UPDATED
+};
+
 // Function prototypes
 std::string argParse(std::string argv);
+
+class Table{
+    int id;
+    std::string sId = "ID";
+    std::string description = "Description";
+    std::string status = "Status";
+    std::string createdAt = "Created At";
+    std::string updatedAt = "Updated At";
+
+    std::vector<std::string> vDesc;
+    std::vector<std::string> vStatus;
+    std::vector<std::string> vCreated;
+    std::vector< std::string> vUpdated;
+
+    int ID_SIZE = sId.size();
+    int DESC_SIZE = description.size();
+    int STATUS_SIZE = status.size();
+    int CREATEDAT_SIZE = createdAt.size();
+    int UPDATEDAT_SIZE = updatedAt.size();
+public:
+
+    Table(std::vector<std::string>& lines){
+        for(auto it = lines.begin(); it != lines.end(); it++){
+            std::istringstream iss(*it);
+            std::string temp;
+            std::string buffer;
+            iss >> temp;
+            if(temp == "\"description\":"){
+                iss.ignore(2);
+                iss >> buffer;
+                
+                iss.str().pop_back();
+                iss.str().pop_back();
+                iss.seekg(20);
+                std::cout << "desc: " << iss.str() << std::endl;
+                std::cout << "desc: " << buffer << std::endl;
+            }
+            // if(iss >> buffer){
+            //     std::cout << "desc: " << buffer << std::endl;
+            // }
+        }
+    }
+
+    void printBorder(){
+        std::cout << "+" << std::string(sId.size()+3, '-') << "+" << std::string(description.size()+5, '-') << "+" << std::string(status.size()+3, '-') << "+" << std::string(createdAt.size(), '-') << "+" << std::string(updatedAt.size(), '-') << std::endl;
+    }
+
+    void printHeader();
+    void print();
+};
 
 class Task{
     const std::string path = "tasks.json";
@@ -175,24 +231,6 @@ class Task{
         }
     }
 
-    // void writeFile(std::ostringstream& oss){
-    //     std::ofstream ofile(path, std::ios::app);
-    //     std::vector<std::string> lines;
-    //     readFile(lines);
-    //     std::vector<std::string>::iterator it;
-    //     for(const auto& line: lines){
-    //         if(line == "["){
-    //             ofile << line << std::endl;
-    //             ofile << oss.str() << "]" << std::endl;
-    //         }
-    //     }
-    //     // std::string last = *(lines.end()-1);
-    //     // for(it = lines.begin(); it != lines.end(); it++){
-
-    //     // }
-    //     ofile.close();
-    // }
-
     std::string date(){
         // std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
         std::time_t time = std::time(nullptr);
@@ -222,11 +260,88 @@ class Task{
         }
         file.close();
     }
+    
+    typedef std::vector<int> vInt;
+    typedef std::vector<std::string> vString;
+    void printTask(vInt& idV, vString& descriptionV, vString& statusV, vString& createdV, vString& updatedV){
+        std::string strId = "id";
+        std::string strDescription = "description";
+        std::string strStatus = "status";
+        std::string strCreated = "created at";
+        std::string strUpdated = "updated at";
+        int id_size = strId.size()+3;
+        int description_size = strDescription.size()+10;
+        int status_size = strStatus.size()+6;
+        int created_size = strCreated.size()+10;
+        int updated_size = strUpdated.size()+10;
 
-    void printTask(std::vector<std::string> lines){
-        for(const auto& line: lines){
-            std::cout << line << std::endl;
+        // Finds max description.size()
+        for(auto it = descriptionV.begin(); it < descriptionV.end(); it++){
+            int i = (*it).size();
+            if(description_size <= i){
+                description_size = i+1;
+            }
         }
+
+        // Prints Table
+        using std::setw;
+        char plus = '+';
+        auto dash = [](int n, char ch = '-'){
+            return std::string(n, ch);
+        };
+
+        auto printBorder = [&](){
+            std::cout << "+" << dash(id_size) << plus << dash(description_size) << plus << dash(status_size) <<
+            plus << dash(created_size) << plus << dash(updated_size) << plus << std::endl;
+        };
+
+        auto printHeader = [&](){
+            std::cout << std::left << "|" << setw(id_size) << strId << "|" << setw(description_size) << strDescription <<
+            "|" << setw(status_size) << strStatus << "|" << setw(created_size) << strCreated << "|" << setw(updated_size) << strUpdated << "|" << std::endl;
+
+        };
+
+        auto printBody = [&](){
+            
+        };
+
+        printBorder();
+        printHeader();
+        printBorder();
+        for(size_t i = 0; i < idV.size(); i++){
+            std::cout << std::left << "|" << setw(id_size) << idV[i] << "|" << setw(description_size) << descriptionV[i] <<
+            "|" << setw(status_size) << statusV[i] << "|" << setw(created_size) << createdV[i] << "|" << setw(updated_size) << updatedV[i] << "|" << std::endl;
+        }
+        printBorder();
+
+        // for(size_t i = 0; i < idV.size(); i++){
+        //     std::cout <<
+        //         idV[i] << ". " << descriptionV[i] << " " <<
+        //         statusV[i] << " " << createdV[i] << " " << updatedV[i] << std::endl;
+        // }
+    }
+
+    Label enumCheck(std::string& temp){
+        enum Label label;
+        if(temp == "id"){
+            label = ID;
+        }
+        else if(temp == "description"){
+            label = DESCRIPTION;
+        }
+        else if(temp == "status"){
+            label = STATUS;
+        }
+        else if(temp == "createdAt"){
+            label = CREATED;
+        }
+        else if(temp == "updatedAt"){
+            label = UPDATED;
+        }
+        else{
+            return NOTHING;
+        }
+        return label;
     }
 
 public:
@@ -411,36 +526,85 @@ public:
         if(task_status == "all" || task_status == "to-do" || task_status == "done" || task_status == "in-progress"){
             std::vector<std::string> lines;
             readFile(lines);
-            if(task_status == "all"){
-                printTask(lines);
-            }
-            else{
-                std::vector<std::string>::iterator it;
-                for(it = lines.begin(); it != lines.end(); it++){
-                    std::istringstream iss(*it);
-                    iss.ignore(15);
-                    std::string c_status;
-                    if(iss >> c_status){
-                        c_status.pop_back();
-                        c_status.pop_back();
-                        // std::cout << "status: " << c_status << std::endl;
-                        // std::cout << "t: " << task_status << std::endl;
-                        if(c_status == task_status){
-                            // std::cout << "status: " << c_status << std::endl;
-                            // std::cout << "t: " << task_status << std::endl;
-                            std::cout << *(it-2) << std::endl;
-                            std::cout << *(it-1) << std::endl;
-                            std::cout << *(it) << std::endl;
-                            std::cout << *(it+1) << std::endl;
-                            std::cout << *(it+2) << std::endl;
-                            std::cout << std::endl;
-                        }
-                        else{
-                            // std::cerr << "Error: Status not found!" << std::endl;    // Unnecessary ig
-                        }
-                    }
+
+            size_t listSize = 0;
+
+            std::vector<int> idV;
+            std::vector<std::string> descriptionV;
+            std::vector<std::string> statusV;
+            std::vector<std::string> createdV;
+            std::vector<std::string> updatedV;
+            for(auto it = lines.begin(); it != lines.end(); it++){
+                std::istringstream iss(*it);
+                std::string temp;
+                iss.ignore(5);
+                if(iss >> temp){
+                    temp.pop_back();
+                    temp.pop_back();
                 }
                 
+                enum Label label;
+                label = enumCheck(temp);
+                std::string labelValue;
+                auto parseLabelValue = [&iss, &labelValue](std::vector<std::string>& labelVector, bool pop = true){
+                    std::getline(iss.ignore(2), labelValue);
+                    if(pop){
+                        labelValue.pop_back();
+                        labelValue.pop_back();
+                    }
+                    else{
+                        labelValue.pop_back();
+                    }
+
+                    labelVector.push_back(labelValue);
+                };
+                switch(label){
+                    case ID:
+                        std::getline(iss.ignore(1), labelValue);
+                        labelValue.pop_back();
+                        idV.push_back((stoi(labelValue)));
+                        break;
+                    case DESCRIPTION:
+                        parseLabelValue(descriptionV);
+                        ++listSize;
+                        break;
+                    case STATUS:
+                        parseLabelValue(statusV);
+                        break;
+                    case CREATED:
+                        parseLabelValue(createdV);
+                        break;
+                    case UPDATED:
+                        parseLabelValue(updatedV, false);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if(task_status == "all"){
+                printTask(idV, descriptionV, statusV, createdV, updatedV);
+            }
+            else{
+                auto checkStatus = [&](){
+                    vInt t_id;
+                    vString t_description;
+                    vString t_status;
+                    vString t_created;
+                    vString t_updated;
+                    for(size_t i = 0; i < listSize; i++){
+                        if(task_status == statusV[i]){
+                            // check condition for the task status
+                            t_id.push_back(idV[i]);
+                            t_description.push_back(descriptionV[i]);
+                            t_status.push_back(statusV[i]);
+                            t_created.push_back(createdV[i]);
+                            t_updated.push_back(updatedV[i]);
+                        }
+                    }
+                    printTask(t_id, t_description, t_status, t_created, t_updated);
+                };
+                checkStatus();
             }
             return;
         }
