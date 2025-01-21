@@ -22,25 +22,24 @@ A simple and efficient command-line To-Do List tracking tool written in C++. Thi
    g++ task-tracker.cpp -o task-tracker
 
 ## Usage
-  # Adding a new task
-  task-tracker add "Buy groceries"
-  Output: Task added successfully (ID: 1)
+  1. Adding a new task
+     task-tracker add "Buy groceries"
 
-  # Updating and deleting tasks
-  task-tracker update 1 "Buy groceries and cook dinner"
-  task-tracker delete 1
+  2. Updating and deleting tasks
+     task-tracker update 1 "Buy groceries and cook dinner"
+     task-tracker delete 1
 
-  # Marking a task as in progress or done
-  task-tracker mark-in-progress 1
-  task-tracker mark-done 1
+  3. Marking a task as in progress or done
+     task-tracker mark-in-progress 1
+     task-tracker mark-done 1
 
-  # Listing all tasks
-  task-tracker list
+  4. Listing all tasks
+     task-tracker list
 
-  # Listing tasks by status
-  task-tracker list done
-  task-tracker list todo
-  task-tracker list in-progress
+  5. Listing tasks by status
+     task-tracker list done
+     task-tracker list todo
+     task-tracker list in-progress
 
 ## Requirements
   C++17 or later.
