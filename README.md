@@ -24,7 +24,7 @@ A simple and efficient command-line To-Do List tracking tool written in C++. Thi
 ## Usage
   # Adding a new task
   task-tracker add "Buy groceries"
-  # Output: Task added successfully (ID: 1)
+  Output: Task added successfully (ID: 1)
 
   # Updating and deleting tasks
   task-tracker update 1 "Buy groceries and cook dinner"
