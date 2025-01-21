@@ -1,7 +1,4 @@
-#include <ios>
 #include <iostream>
-#include <cstdlib>
-#include <limits>
 #include <iomanip>
 #include <fstream>
 #include <chrono>
@@ -9,15 +6,6 @@
 #include <string.h>
 #include <vector>
 #include <iterator>
-#include <algorithm>
-
-// Bug: command arguments following "add" command works but are also added to the task-file as tasks.
-// Formed JSON object //
-// Form JSON array  //
-// Implement how to write the object/array to file in a proper format   //
-// Display tasks
-// Learn to make tables
-// You can do it!
 
 constexpr auto max_size = std::numeric_limits<std::streamsize>::max();
 
@@ -174,15 +162,6 @@ class Task{
                 new_lines.push_back(temp);
                 break;
             }
-
-    
-            // for(char x: *it){
-            //     if(x == '}' && *(it+1) != "]"){
-            //         std::cout << "x: " << std::endl;
-            //         *it = *it + ",";
-            //     }
-            // }
-
             ++it;
         }
 
@@ -313,12 +292,6 @@ class Task{
             "|" << setw(status_size) << statusV[i] << "|" << setw(created_size) << createdV[i] << "|" << setw(updated_size) << updatedV[i] << "|" << std::endl;
         }
         printBorder();
-
-        // for(size_t i = 0; i < idV.size(); i++){
-        //     std::cout <<
-        //         idV[i] << ". " << descriptionV[i] << " " <<
-        //         statusV[i] << " " << createdV[i] << " " << updatedV[i] << std::endl;
-        // }
     }
 
     Label enumCheck(std::string& temp){
