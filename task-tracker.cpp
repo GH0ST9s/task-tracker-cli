@@ -16,56 +16,6 @@ enum Label{
 // Function prototypes
 std::string argParse(std::string argv);
 
-class Table{
-    int id;
-    std::string sId = "ID";
-    std::string description = "Description";
-    std::string status = "Status";
-    std::string createdAt = "Created At";
-    std::string updatedAt = "Updated At";
-
-    std::vector<std::string> vDesc;
-    std::vector<std::string> vStatus;
-    std::vector<std::string> vCreated;
-    std::vector< std::string> vUpdated;
-
-    int ID_SIZE = sId.size();
-    int DESC_SIZE = description.size();
-    int STATUS_SIZE = status.size();
-    int CREATEDAT_SIZE = createdAt.size();
-    int UPDATEDAT_SIZE = updatedAt.size();
-public:
-
-    Table(std::vector<std::string>& lines){
-        for(auto it = lines.begin(); it != lines.end(); it++){
-            std::istringstream iss(*it);
-            std::string temp;
-            std::string buffer;
-            iss >> temp;
-            if(temp == "\"description\":"){
-                iss.ignore(2);
-                iss >> buffer;
-                
-                iss.str().pop_back();
-                iss.str().pop_back();
-                iss.seekg(20);
-                std::cout << "desc: " << iss.str() << std::endl;
-                std::cout << "desc: " << buffer << std::endl;
-            }
-            // if(iss >> buffer){
-            //     std::cout << "desc: " << buffer << std::endl;
-            // }
-        }
-    }
-
-    void printBorder(){
-        std::cout << "+" << std::string(sId.size()+3, '-') << "+" << std::string(description.size()+5, '-') << "+" << std::string(status.size()+3, '-') << "+" << std::string(createdAt.size(), '-') << "+" << std::string(updatedAt.size(), '-') << std::endl;
-    }
-
-    void printHeader();
-    void print();
-};
-
 class Task{
     const std::string path = "tasks.json";
     int id;
