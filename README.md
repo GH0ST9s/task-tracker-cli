@@ -16,9 +16,11 @@ A simple and efficient command-line To-Do List tracking tool written in C++. Thi
    git clone https://github.com/your-username/todo-list-cli.git
 
 2. Navigate to the project directory:
+   ```bash
    cd task-tracker-cli
 
 3. Compile the program (requires a C++ compiler like g++):
+   ```bash
    g++ task-tracker.cpp -o task-tracker
 
 ## Usage
