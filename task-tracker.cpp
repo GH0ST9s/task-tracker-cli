@@ -534,11 +534,27 @@ public:
         std::cerr << "Error: Invalid task status!" << std::endl;
     }
 
-};
+    void help(){
+        std::cout << "# Add Task" << std::endl;
+        std::cout << "  task-tracker add <task_description>" << std::endl << std::endl;
+
+        std::cout << "# Update Task" << std::endl;
+        std::cout << "  task-tracker update <task_id> <new_description>" << std::endl << std::endl;
+
+        std::cout << "# Delete Task" << std::endl;
+        std::cout << "  task-tracker delete <task_id>" << std::endl << std::endl;
+
+        std::cout << "# Mark Task" << std::endl;
+        std::cout << "  task-tracker mark-<status> <task_id>" << std::endl;
+        std::cout << "  <status>: [to-do | in-progress | done]" << std::endl << std::endl;
+
+        std::cout << "# List Task" << std::endl;
+        std::cout << "  task-tracker list | task-tracker list <status>" << std::endl << std::endl;
+    }
+
+}task;
 
 int main(int argc, char* argv[]){
-
-    Task task;
 
     for(int i = 1; i < argc; i++){
         if(strcmp("add", argv[i]) == 0){
@@ -566,6 +582,10 @@ int main(int argc, char* argv[]){
                 task.listTask(argv[i+1]);
                 i++;
             }
+        }
+        else if(strcmp("help", argv[i]) == 0){
+            task.help();
+            i++;
         }
     }
     
